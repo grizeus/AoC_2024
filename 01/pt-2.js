@@ -11,11 +11,11 @@ const right = [];
 fileContent
   .split("\r\n")
   .map((line) => line.split("   "))
-  .map(([a, b]) => { left.push(a), right.push(b) });
+  .map(([a, b]) => {
+    left.push(a), right.push(b)
+  });
 
-arr1.sort((a, b) => a - b);
-arr2.sort((a, b) => a - b);
+const similarity = left.map(lEl => right.filter(rEl => rEl === lEl));
+const sum = left.reduce((sum, elem, i) => sum + (elem * similarity[i].length), 0);
 
-const sorted = arr1.map((val, index) => [val, arr2[index]]);
-
-console.log(sorted.reduce((sum, [a, b]) => sum + Math.abs(a - b), 0));
+console.log(sum);
