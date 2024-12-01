@@ -13,9 +13,10 @@ fileContent
   .map((line) => line.split("   "))
   .map(([a, b]) => { left.push(a), right.push(b) });
 
-arr1.sort((a, b) => a - b);
-arr2.sort((a, b) => a - b);
+left.sort((a, b) => a - b);
+right.sort((a, b) => a - b);
 
-const sorted = arr1.map((val, index) => [val, arr2[index]]);
+const sorted = left.map((val, index) => [val, right[index]]);
+const sum = sorted.reduce((sum, [a, b]) => sum + Math.abs(a - b), 0);
 
-console.log(sorted.reduce((sum, [a, b]) => sum + Math.abs(a - b), 0));
+console.log(sum);
