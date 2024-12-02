@@ -10,6 +10,8 @@ const reports = fileContent
   .map((line) => line.split(" ").map((val) => +val));
 
 let safeReports = 0;
+let safeDamp = 0;
+
 const isSafeAscending = (array) =>
   array.every((diff) => diff >= 1 && diff <= 3);
 const isSafeDescending = (array) =>
@@ -28,20 +30,21 @@ for (let report of reports) {
     continue;
   }
 
-  const length = diff.length;
+  const length = report.length;
   for (let i = 0; i < length; i++) {
-    const filtered = diff.filter((_, index) => index !== i);
-    const isDampAscending = isSafeAscending(filtered);
+    const filteredReport = report.slice().filter((_, index) => index !== i);
+    const filteredDiff = filteredReport.slice(1).map((num, i) => num - filteredReport[i]);
+    const isDampAscending = isSafeAscending(filteredDiff);
     if (isDampAscending) {
-      safeReports++;
+      safeDamp++;
       break;
     }
-    const isDampDescending = isSafeDescending(filtered);
+    const isDampDescending = isSafeDescending(filteredDiff);
     if (isDampDescending) {
-      safeReports++;
+      safeDamp++;
       break;
     }
   }
 }
 
-console.log(safeReports);
+console.log(safeReports + safeDamp);
