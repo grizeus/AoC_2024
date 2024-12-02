@@ -10,6 +10,8 @@ const reports = fileContent
   .map((line) => line.split(" ").map((val) => +val));
 
 let safeReports = 0;
+let at = 0;
+
 const isSafeAscending = (array) =>
   array.every((diff) => diff >= 1 && diff <= 3);
 const isSafeDescending = (array) =>
@@ -30,15 +32,18 @@ for (let report of reports) {
 
   const length = diff.length;
   for (let i = 0; i < length; i++) {
-    const filtered = diff.filter((_, index) => index !== i);
+    at++;
+    const filtered = diff.slice().filter((_, index) => index !== i);
     const isDampAscending = isSafeAscending(filtered);
     if (isDampAscending) {
       safeReports++;
+      console.log("damp asc at ", at, filtered, diff);
       break;
     }
     const isDampDescending = isSafeDescending(filtered);
     if (isDampDescending) {
       safeReports++;
+      console.log("damp desc at ", at, filtered, diff);
       break;
     }
   }
