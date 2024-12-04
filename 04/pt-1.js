@@ -5,25 +5,36 @@ const fileContent = (
   await fs.readFile(path.join(process.cwd(), "test.txt"))
 ).toString("utf8");
 
-const getUnique = (arr)=> {
-  return arr.filter((v, i, array) => array.indexOf(v) === i);
+const getUnique = (arr) => {
+  const filtered = arr.filter((v, i, array) => array.indexOf(v) === i);
+  return filtered.map((line) => line.split(" ")).map(([a, b]) => [Number(a), Number(b)]);
+};
+
+const iteration = (indices, char) => {
+  const output = [];
+  for (const i of indices) {
+    for (const d of directions) {
+      const c = [d[0] + i[0], d[1] + i[1]];
+      if (
+        c[0] > 0 &&
+        c[0] < lineLen &&
+        c[1] > 0 &&
+        c[1] < linesLen &&
+        grid[c[0]][c[1]] === char
+      )
+        output.push(`${c[0]} ${c[1]}`);
+    }
+  }
+  return getUnique(output);
 };
 
 const grid = fileContent.split("\r\n").map((line) => line.split(""));
-grid.pop();
 const linesLen = grid.length;
 const lineLen = grid[0].length;
-const x = "X";
-const m = "M";
-const a = "A";
-const s = "S";
 const indicesX = [];
-const indicesM = [];
-const indicesA = [];
-const indicesS = [];
 for (let i = 0; i < linesLen; ++i) {
   for (let j = 0; j < lineLen; ++j) {
-    if (grid[i][j] === x) indicesX.push([i, j]);
+    if (grid[i][j] === "X") indicesX.push([i, j]);
   }
 }
 const directions = [
@@ -37,47 +48,8 @@ const directions = [
   [-1, 1],
 ];
 
-for (const i of indicesX) {
-  for (const d of directions) {
-    const c = [d[0] + i[0], d[1] + i[1]];
-    if (
-      c[0] > 0 &&
-      c[0] < lineLen &&
-      c[1] > 0 &&
-      c[1] < linesLen &&
-      grid[c[0]][c[1]] === m
-    )
-      indicesM.push(`${c[0]} ${c[1]}`);
-  }
-}
-let uniqueM = getUnique(indicesM);
-// for (const i of indicesM) {
-//   for (const d of directions) {
-//     const c = [d[0] + i[0], d[1] + i[1]];
-//     if (
-//       c[0] > 0 &&
-//       c[0] < lineLen &&
-//       c[1] > 0 &&
-//       c[1] < linesLen &&
-//       grid[c[0]][c[1]] === a
-//     ) {
-//       indicesA.push([c[0], c[1]]);
-//     }
-//   }
-// }
-// for (const i of indicesA) {
-//   for (const d of directions) {
-//     const c = [d[0] + i[0], d[1] + i[1]];
-//     if (
-//       c[0] > 0 &&
-//       c[0] < lineLen &&
-//       c[1] > 0 &&
-//       c[1] < linesLen &&
-//       grid[c[0]][c[1]] === s
-//     ) {
-//       indicesS.push([c[0], c[1]]);
-//     }
-//   }
-// }
+const indicesM = iteration(indicesX, "M");
+const indicesA = iteration(indicesM, "A");
+const indicesS = iteration(indicesA, "S");
 
-console.table(uniqueM);
+console.table(indicesS);
