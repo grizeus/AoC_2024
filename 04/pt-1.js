@@ -7,25 +7,28 @@ const fileContent = (
 
 const getUnique = (arr) => {
   const filtered = arr.filter((v, i, array) => array.indexOf(v) === i);
-  return filtered.map((line) => line.split(" ")).map(([a, b]) => [Number(a), Number(b)]);
+  return filtered
+    .map((line) => line.split(" "))
+    .map(([a, b]) => [Number(a), Number(b)]);
 };
 
-const iteration = (indices, char) => {
+const iteration = (indices, char, prev) => {
   const output = [];
-  for (const i of indices) {
-    for (const d of directions) {
-      const c = [d[0] + i[0], d[1] + i[1]];
+  for (const [ix, iy] of indices) {
+    for (const dir of directions) {
+      const [dx, dy] = dir.coord;
+      const [cx, cy] = [dx + ix, dy + iy];
       if (
-        c[0] > 0 &&
-        c[0] < lineLen &&
-        c[1] > 0 &&
-        c[1] < linesLen &&
-        grid[c[0]][c[1]] === char
+        cx > 0 &&
+        cx < lineLen &&
+        cy > 0 &&
+        cy < linesLen &&
+        grid[cx][cy] === char
       )
-        output.push(`${c[0]} ${c[1]}`);
+        output.push([cx, cy]);
     }
   }
-  return getUnique(output);
+  return output;
 };
 
 const grid = fileContent.split("\r\n").map((line) => line.split(""));
@@ -38,18 +41,22 @@ for (let i = 0; i < linesLen; ++i) {
   }
 }
 const directions = [
-  [1, 0],
-  [-1, 0],
-  [0, 1],
-  [0, -1],
-  [1, 1],
-  [-1, -1],
-  [1, -1],
-  [-1, 1],
+  { name: "TL", coord: [-1, 1] },
+  { name: "T", coord: [0, 1] },
+  { name: "TR", coord: [1, 1] },
+  { name: "L", coord: [-1, 0] },
+  { name: "R", coord: [1, 0] },
+  { name: "BL", coord: [-1, -1] },
+  { name: "B", coord: [0, -1] },
+  { name: "BR", coord: [1, -1] },
 ];
 
-const indicesM = iteration(indicesX, "M");
-const indicesA = iteration(indicesM, "A");
-const indicesS = iteration(indicesA, "S");
+const indicesM = iteration(indicesX, "M", "X");
+const indicesA = iteration(indicesM, "A", "M");
+const indicesS = iteration(indicesA, "S", "A");
 
 console.table(indicesS);
+
+for (const dir of directions) {
+  console.log(dir.name);
+}
