@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 
 const fileContent = (
-  await fs.readFile(path.join(process.cwd(), "test.txt"))
+  await fs.readFile(path.join(process.cwd(), "input.txt"))
 ).toString("utf8");
 
 // Convert grid string to 2D array
@@ -31,7 +31,10 @@ const checkWordInDirection = (startRow, startCol, direction) => {
     if (!isValidPosition(row, col) || grid[row][col] !== word[i]) {
       break;
     }
-    positions.push([row, col]);
+    //log only "A" positions
+    if (i === 1) {
+      positions.push([row, col]);
+    }
 
     if (i === word.length - 1) {
       return positions;
@@ -51,6 +54,7 @@ const checkWordInDirection = (startRow, startCol, direction) => {
     ) {
       break;
     }
+    //log only "A" positions
     if (i === 1) {
       positions.push([row, col]);
     }
@@ -87,7 +91,27 @@ const findAllWordsInGrid = (grid, word) => {
   return validPositions;
 };
 
-const word = "XMAS";
+const word = "MAS";
 
-const results = findAllWordsInGrid(grid, word);
-console.log(`Found ${results.length} occurrences of '${word}'`);
+const coordsOfAs = findAllWordsInGrid(grid, word);
+const magnitudesOfA = coordsOfAs
+  .flatMap((results) => results)
+  .reduce((acc, curr) => {
+    acc[curr] = (acc[curr] || 0) + 1;
+    return acc;
+  }, {});
+const count = Object.values(magnitudesOfA).reduce(
+  (acc, curr) => (curr === 2 ? acc + 1 : acc),
+  0
+);
+console.log(`count: ${count}`);
+
+// for (let result of results) {
+//   console.log(
+//     grid.map((row, y) =>
+//       row.map((_, x) =>
+//         result.some((coord) => coord[0] === x && coord[1] === y) ? _ : "."
+//       ).join("")
+//     ).join("\n")
+//   );
+// }
