@@ -1,3 +1,4 @@
+import assert from "node:assert";
 import fs from "node:fs/promises";
 import path from "node:path";
 
@@ -5,18 +6,12 @@ const fileContent = (
   await fs.readFile(path.join(process.cwd(), "test.txt"))
 ).toString("utf8");
 
-const getUnique = (arr) => {
-  const filtered = arr.filter((v, i, array) => array.indexOf(v) === i);
-  return filtered
-    .map((line) => line.split(" "))
-    .map(([a, b]) => [Number(a), Number(b)]);
-};
+const word = "XMAS".split("");
 
-const iteration = (indices, char, prev) => {
+const iteration = (indices, char) => {
   const output = [];
   for (const [ix, iy] of indices) {
-    for (const dir of directions) {
-      const [dx, dy] = dir.coord;
+    for (const [dx, dy] of directions) {
       const [cx, cy] = [dx + ix, dy + iy];
       if (
         cx > 0 &&
@@ -25,7 +20,29 @@ const iteration = (indices, char, prev) => {
         cy < linesLen &&
         grid[cx][cy] === char
       )
-        output.push([cx, cy]);
+        if (char !== "M") {
+          const coef = word.indexOf(char);
+          assert(coef > 1);
+          const scaledDir = directions.map(([dx, dy]) => [
+            dx * coef,
+            dy * coef,
+          ]);
+          // s for scaled
+          for (const [sdx, sdy] of scaledDir) {
+            const [scx, scy] = [cx + sdx, cy + sdy];
+            if (
+              scx > 0 &&
+              scx < lineLen &&
+              scy > 0 &&
+              scy < linesLen &&
+              grid[scx][scy] === word[0]
+            ) {
+              output.push([cx, cy]);
+            }
+          }
+        } else {
+          output.push([cx, cy]);
+        }
     }
   }
   return output;
@@ -41,22 +58,21 @@ for (let i = 0; i < linesLen; ++i) {
   }
 }
 const directions = [
-  { name: "TL", coord: [-1, 1] },
-  { name: "T", coord: [0, 1] },
-  { name: "TR", coord: [1, 1] },
-  { name: "L", coord: [-1, 0] },
-  { name: "R", coord: [1, 0] },
-  { name: "BL", coord: [-1, -1] },
-  { name: "B", coord: [0, -1] },
-  { name: "BR", coord: [1, -1] },
+  [-1, 0],
+  [1, 0],
+  [0, -1],
+  [0, 1],
+  [1, 1],
+  [-1, 1],
+  [1, -1],
+  [-1, -1],
 ];
 
-const indicesM = iteration(indicesX, "M", "X");
-const indicesA = iteration(indicesM, "A", "M");
-const indicesS = iteration(indicesA, "S", "A");
+const indicesM = iteration(indicesX, word[1]);
+const indicesA = iteration(indicesM, word[2]);
+const indicesS = iteration(indicesA, word[3]);
 
-console.table(indicesS);
-
-for (const dir of directions) {
-  console.log(dir.name);
-}
+console.table(indicesX.length);
+console.table(indicesM.length);
+console.table(indicesA.length);
+console.table(indicesS.length);
