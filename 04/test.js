@@ -1,4 +1,3 @@
-import assert from "node:assert";
 import fs from "node:fs/promises";
 import path from "node:path";
 
@@ -24,11 +23,11 @@ function findAllWordsInGrid(grid, word) {
     [-1, -1], // Diagonal up-left
   ];
 
-  function isValidPosition(row, col) {
+  const isValidPosition = (row, col) => {
     return row >= 0 && row < rows && col >= 0 && col < cols;
-  }
+  };
 
-  function checkWordInDirection(startRow, startCol, direction) {
+  const checkWordInDirection = (startRow, startCol, direction) => {
     const [dx, dy] = direction;
     const positions = [];
 
@@ -90,11 +89,7 @@ function findAllWordsInGrid(grid, word) {
   return validPositions;
 }
 
-// Test the function
 const word = "XMAS";
 
 const results = findAllWordsInGrid(grid, word);
-console.log(`Found ${results.length} occurrences of '${word}':`);
-results.forEach((positions, index) => {
-  console.log(`Occurrence ${index + 1}:`, positions);
-});
+console.log(`Found ${results.length} occurrences of '${word}'`);
