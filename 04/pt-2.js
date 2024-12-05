@@ -105,13 +105,3 @@ const count = Object.values(magnitudesOfA).reduce(
   0
 );
 console.log(`Found ${count} occurrences of '${word}'-crosses`);
-
-// for (let result of results) {
-//   console.log(
-//     grid.map((row, y) =>
-//       row.map((_, x) =>
-//         result.some((coord) => coord[0] === x && coord[1] === y) ? _ : "."
-//       ).join("")
-//     ).join("\n")
-//   );
-// }
