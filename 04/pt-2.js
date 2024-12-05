@@ -104,7 +104,7 @@ const count = Object.values(magnitudesOfA).reduce(
   (acc, curr) => (curr === 2 ? acc + 1 : acc),
   0
 );
-console.log(`count: ${count}`);
+console.log(`Found ${count} occurrences of '${word}'-crosses`);
 
 // for (let result of results) {
 //   console.log(
