@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 
 const fileContent = (
-  await fs.readFile(path.join(process.cwd(), "input.txt"))
+  await fs.readFile(path.join(process.cwd(), "test.txt"))
 ).toString("utf8");
 
 // Convert grid string to 2D array
@@ -11,10 +11,6 @@ const rows = grid.length;
 const cols = grid[0].length;
 
 const directions = [
-  [0, 1], // Right
-  [0, -1], // Left
-  [1, 0], // Down
-  [-1, 0], // Up
   [1, 1], // Diagonal down-right
   [1, -1], // Diagonal down-left
   [-1, 1], // Diagonal up-right
@@ -55,7 +51,9 @@ const checkWordInDirection = (startRow, startCol, direction) => {
     ) {
       break;
     }
-    positions.push([row, col]);
+    if (i === 1) {
+      positions.push([row, col]);
+    }
 
     if (i === word.length - 1) {
       return positions;
@@ -66,7 +64,6 @@ const checkWordInDirection = (startRow, startCol, direction) => {
 
   return null;
 };
-
 
 const findAllWordsInGrid = (grid, word) => {
   const validPositions = [];
