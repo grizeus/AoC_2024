@@ -2,53 +2,95 @@ import fs from "node:fs/promises";
 import path from "node:path";
 
 const fileContent = (
-  await fs.readFile(path.join(process.cwd(), "test.txt"))
+  await fs.readFile(path.join(process.cwd(), "input.txt"))
 ).toString("utf8");
 
-const grid = fileContent.split('\r\n').map(line => line.split(""));
-grid.pop();
-const linesLen = grid.length;
-const lineLen = grid[0].length;
-const x = "X";
-const m = "M";
-const a = "A";
-const s = "S";
-const indicesX = [];
-const indicesM = [];
-const indicesA = [];
-const indicesS = [];
-for (let i = 0; i < linesLen; ++i) {
-  for (let j = 0; j < lineLen; ++j) {
-    if (grid[i][j] === x)
-      indicesX.push([i, j]);
-  }
-}
-const directions = [[1, 0], [-1, 0], [0, 1], [0, -1],
-[1, 1], [-1, -1], [1, -1], [-1, 1]];
+// Convert grid string to 2D array
+const grid = fileContent.split("\r\n").map((line) => line.split(""));
+const rows = grid.length;
+const cols = grid[0].length;
 
-for (const i of indicesX) {
-  for (const d of directions) {
-    const c = [d[0] + i[0], d[1] + i[1]];
-    if (c[0] > 0 && c[0] < lineLen && c[1] > 0 && c[1] < linesLen && grid[c[0]][c[1]] === m)
-      indicesM.push([c[0], c[1]]);
+const directions = [
+  [0, 1], // Right
+  [0, -1], // Left
+  [1, 0], // Down
+  [-1, 0], // Up
+  [1, 1], // Diagonal down-right
+  [1, -1], // Diagonal down-left
+  [-1, 1], // Diagonal up-right
+  [-1, -1], // Diagonal up-left
+];
+
+const isValidPosition = (row, col) => {
+  return row >= 0 && row < rows && col >= 0 && col < cols;
+};
+const checkWordInDirection = (startRow, startCol, direction) => {
+  const [dx, dy] = direction;
+  const positions = [];
+
+  // Forward search
+  let row = startRow;
+  let col = startCol;
+  for (let i = 0; i < word.length; i++) {
+    if (!isValidPosition(row, col) || grid[row][col] !== word[i]) {
+      break;
+    }
+    positions.push([row, col]);
+
+    if (i === word.length - 1) {
+      return positions;
+    }
+    row += dx;
+    col += dy;
   }
-}
-for (const i of indicesM) {
-  for (const d of directions) {
-    const c = [d[0] + i[0], d[1] + i[1]];
-    if (c[0] > 0 && c[0] < lineLen && c[1] > 0 && c[1] < linesLen && grid[c[0]][c[1]] === a) {
-      indicesA.push([c[0], c[1]]);
+
+  // Backward search
+  row = startRow;
+  col = startCol;
+  positions.length = 0;
+  for (let i = 0; i < word.length; i++) {
+    if (
+      !isValidPosition(row, col) ||
+      grid[row][col] !== word[word.length - 1 - i]
+    ) {
+      break;
+    }
+    positions.push([row, col]);
+
+    if (i === word.length - 1) {
+      return positions;
+    }
+    row += dx;
+    col += dy;
+  }
+
+  return null;
+};
+
+
+const findAllWordsInGrid = (grid, word) => {
+  const validPositions = [];
+
+  // Search for word
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      // If first letter matches
+      if (grid[row][col] === word[0]) {
+        // Check in all directions
+        for (let direction of directions) {
+          const foundPositions = checkWordInDirection(row, col, direction);
+          if (foundPositions) {
+            validPositions.push(foundPositions);
+          }
+        }
+      }
     }
   }
-}
-for (const i of indicesA) {
-  for (const d of directions) {
-    const c = [d[0] + i[0], d[1] + i[1]];
-    if (c[0] > 0 && c[0] < lineLen && c[1] > 0 && c[1] < linesLen && grid[c[0]][c[1]] === s) {
-      console.log(grid[c[0]][c[1]]);
-      indicesS.push([c[0], c[1]]);
-    }
-  }
-}
 
-console.log(indicesS.length);
+  return validPositions;
+};
+
+const word = "XMAS";
+
+const results = findAllWordsInGrid(grid, word);
+console.log(`Found ${results.length} occurrences of '${word}'`);
