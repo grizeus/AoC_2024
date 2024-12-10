@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 
-const grid = (await fs.readFile(path.join(process.cwd(), "test.txt"), "utf8"))
+const grid = (await fs.readFile(path.join(process.cwd(), "input.txt"), "utf8"))
   .split("\r\n")
   .map((line) => line.split(""));
 
@@ -38,6 +38,7 @@ class Guard {
     this.position = { x: x, y: y };
     this.grid = newGrid;
     this.seenObstacle.clear();
+    this.direction = directions.up;
   }
 
   turnRight() {
@@ -58,7 +59,6 @@ class Guard {
     } else {
       this.loops++;
       this.isCycled = true;
-      console.log(this.seenObstacle);
       this.seenObstacle.clear();
     }
   }
@@ -149,8 +149,6 @@ for (let row = 0; row < rows; row++) {
       continue;
     }
     newGrid[row][col] = "#";
-    // console.log(newGrid.map((m) => m.join("")).join("\n"));
-    // console.log();
     guard.reset(initialPosition, newGrid);
     let position = guard.position;
     guard.isCycled = false;
