@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 
 const fileInput = (
-  await fs.readFile(path.join(process.cwd(), "test.txt"), "utf8")
+  await fs.readFile(path.join(process.cwd(), "input.txt"), "utf8")
 )
   .split("\r\n")
   .map((m) => m.split(":"))
@@ -42,7 +42,13 @@ const aggregate = (desire, input) => {
   while (possibleCombinationsCount > 0) {
     for (const combination of possibleCombinations) {
       for (let i = 0; i < input.length - 1; i++) {
-        if (combination[i] === 1) {
+        if (combination[i] === 2) {
+          buff = Number(`${buff}${input[i + 1]}`);
+          if (Number.isNaN(buff)) throw new Error("Not a number");
+          if (buff === desire && i === input.length - 2) return desire;
+          else if (buff > desire) break;
+        }
+        else if (combination[i] === 1) {
           buff += input[i + 1];
           if (buff === desire && i === input.length - 2) return desire;
           else if (buff > desire) break;
@@ -59,12 +65,14 @@ const aggregate = (desire, input) => {
   return 0;
 };
 
-console.log(
-  fileInput
-    .map((arr) => {
-      return aggregate(arr[0], arr[1]);
-    })
-    .reduce((val, acc) => acc + val, 0)
-);
-
-console.log(generateCombinations(3, 3));
+try {
+  console.log(
+    fileInput
+      .map((arr) => {
+        return aggregate(arr[0], arr[1]);
+      })
+      .reduce((val, acc) => acc + val, 0)
+  );
+} catch (err) {
+  console.error(err.message);
+}
