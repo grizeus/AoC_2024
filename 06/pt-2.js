@@ -37,6 +37,7 @@ class Guard {
     const { x, y } = position;
     this.position = { x: x, y: y };
     this.grid = newGrid;
+    this.seenObstacle.clear();
   }
 
   turnRight() {
