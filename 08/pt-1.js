@@ -1,50 +1,56 @@
-import { pathBuilder, createGrid, isValidPosition, DIRECTIONS } from "../utils/utils.js";
+import {
+  pathBuilder,
+  createGrid,
+  isValidPosition,
+  MultiMap,
+  generateUniqueCombinations,
+} from "../utils/utils.js";
 
-const path = pathBuilder("test.txt");
+const path = pathBuilder("input.txt");
 const grid = await createGrid(path);
 
 const rows = grid.length;
 const cols = grid[0].length;
 
-const antinodes = [];
-const checkInDirection = (startRow, startCol, direction, character) => {
-  const [dx, dy] = direction;
-  const positions = [];
-  const limit = rows / 2;
+const getAntinodes = (antenaA, antenaB) => {
+  const res = [];
+  const [ay, ax] = antenaA;
+  const [by, bx] = antenaB;
 
-  // Forward search
-  let row = startRow;
-  let col = startCol;
-  for (let i = 0; i < limit; i++) {
-    if (!isValidPosition(row, col, rows, cols) || (grid[row][col] !== '.' && grid[row][col] !== character)) {
-      break;
-    }
-    positions.push([row, col]);
+  const [cy, cx] = [ax - (bx - ax), ay - (by - ay)];
+  const [dy, dx] = [bx - (ax - bx), by - (ay - by)];
 
-    if (grid[row][col] === character && (row !== startRow || col !== startCol)) {
-      return positions;
-    }
-    row += dx;
-    col += dy;
+  if (isValidPosition(cy, cx, rows, cols)) {
+    res.push(`${cy}|${cx}`);
+  }
+  if (isValidPosition(dy, dx, rows, cols)) {
+    res.push(`${dy}|${dx}`);
   }
 
-  return null;
+  return res;
 };
+
+const frequency = new MultiMap();
 
 for (let row = 0; row < rows; row++) {
   for (let col = 0; col < cols; col++) {
-
-    if (grid[row][col] !== '.') {
-      for (const direction of DIRECTIONS) {
-        const pairs = checkInDirection(row, col, direction, grid[row][col]);
-        if (pairs) {
-          antinodes.push(pairs);
-        }
-      }
-
+    if (grid[row][col] !== ".") {
+      frequency.insert(grid[row][col], [row, col]);
     }
   }
 }
 
-
-console.log(antinodes);
+const keys = frequency.keys();
+const antinodes = [];
+for (const key of keys) {
+  const antenas = frequency.get(key);
+  const possibilities = generateUniqueCombinations(antenas.length - 1, 2);
+  for (const pos of possibilities) {
+    const res = getAntinodes(antenas[pos[0]], antenas[pos[1]]);
+    if (res) {
+      antinodes.push(res);
+    }
+  }
+}
+const uniqueAntinodes = antinodes.flat().filter((v, i, arr) => arr.indexOf(v) === i);
+console.log(uniqueAntinodes.length);
