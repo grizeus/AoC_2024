@@ -1,78 +1,72 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 
-const fileInput = (
-  await fs.readFile(path.join(process.cwd(), "input.txt"), "utf8")
-)
-  .split("\r\n")
-  .map((m) => m.split(":"))
-  .map((operands) => [
-    +operands[0],
-    operands[1]
-      .split(" ")
-      .filter((val) => val !== "")
-      .map((val) => +val),
-  ]);
+const parseFileInput = async (filePath) => {
+  const rawData = await fs.readFile(filePath, "utf8");
+  return rawData
+    .split("\r\n")
+    .map((line) => line.split(":"))
+    .map(([target, values]) => [
+      Number(target),
+      values
+        .split(" ")
+        .filter(Boolean)
+        .map(Number),
+    ]);
+};
 
 const generateCombinations = (size, base) => {
   const combinations = [];
   const totalCombinations = Math.pow(base, size);
   for (let i = 0; i < totalCombinations; i++) {
-    const combination = [];
-    let num = i;
-
-    for (let j = 0; j < size; j++) {
-      combination.push(num % base);
-      num = Math.floor(num / base);
-    }
+    const combination = Array.from({ length: size }, (_, index) => {
+      return Math.floor(i / Math.pow(base, index)) % base;
+    });
     combinations.push(combination);
   }
-
   return combinations;
 };
 
-const aggregate = (desire, input) => {
-  let possibleCombinationsCount = Math.pow(3, input.length - 1);
-  const possibleCombinations = generateCombinations(
-    input.length - 1,
-    3
-  );
-  let buff = input[0];
+const aggregate = (desiredValue, inputValues) => {
+  const operationsCount = inputValues.length - 1;
+  const combinations = generateCombinations(operationsCount, 3);
 
-  while (possibleCombinationsCount > 0) {
-    for (const combination of possibleCombinations) {
-      for (let i = 0; i < input.length - 1; i++) {
-        if (combination[i] === 2) {
-          buff = Number(`${buff}${input[i + 1]}`);
-          if (Number.isNaN(buff)) throw new Error("Not a number");
-          if (buff === desire && i === input.length - 2) return desire;
-          else if (buff > desire) break;
-        }
-        else if (combination[i] === 1) {
-          buff += input[i + 1];
-          if (buff === desire && i === input.length - 2) return desire;
-          else if (buff > desire) break;
-        } else if (combination[i] === 0) {
-          buff *= input[i + 1];
-          if (buff === desire && i === input.length - 2) return desire;
-          else if (buff > desire) break;
-        }
+  for (const combination of combinations) {
+    let result = inputValues[0];
+    let valid = true;
+
+    for (let i = 0; i < operationsCount; i++) {
+      const currentValue = inputValues[i + 1];
+      if (combination[i] === 0) result *= currentValue;
+      else if (combination[i] === 1) result += currentValue;
+      else if (combination[i] === 2) {
+        result = Number(`${result}${currentValue}`);
+        if (Number.isNaN(result)) throw new Error("Invalid number formed");
       }
-      buff = input[0];
+
+      if (result > desiredValue) {
+        valid = false;
+        break;
+      }
     }
-    possibleCombinationsCount--;
+
+    if (valid && result === desiredValue) return desiredValue;
   }
+
   return 0;
 };
 
 try {
-  console.log(
-    fileInput
-      .map((arr) => {
-        return aggregate(arr[0], arr[1]);
-      })
-      .reduce((val, acc) => acc + val, 0)
-  );
-} catch (err) {
-  console.error(err.message);
+  const filePath = path.join(process.cwd(), "input.txt");
+  const fileInput = await parseFileInput(filePath);
+
+  const result = fileInput
+    .map(([desiredValue, inputValues]) => aggregate(desiredValue, inputValues))
+    .reduce((acc, value) => acc + value, 0);
+
+  console.log(result);
+} catch (error) {
+  console.error("Error:", error.message);
 }
+
+
