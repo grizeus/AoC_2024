@@ -16,10 +16,8 @@ export const createGrid = async (filePath) => {
 export const parseInput = async (filePath) => {
   if (typeof filePath !== "string") throw new Error("Not a string");
   const rawData = await fs.readFile(filePath, "utf8");
-  return rawData
-    .split("\r\n")
-    .filter(Boolean).toString();
-}
+  return rawData.split("\r\n").filter(Boolean).toString();
+};
 
 export const DIRECTIONS = [
   [0, 1], // Right
@@ -31,6 +29,59 @@ export const DIRECTIONS = [
   [-1, 1], // Diagonal up-right
   [-1, -1], // Diagonal up-left
 ];
+
+export const RECT_DIRECTIONS = [
+  [0, 1], // Right
+  [0, -1], // Left
+  [1, 0], // Down
+  [-1, 0], // Up
+];
+
+export const DIAG_DIRECTIONS = [
+  [1, 1], // Diagonal down-right
+  [1, -1], // Diagonal down-left
+  [-1, 1], // Diagonal up-right
+  [-1, -1], // Diagonal up-left
+];
+
+export const createGraphFromMatrix = (matrix, isDiagonal = false) => {
+  const rows = matrix.length;
+  const cols = matrix[0].length;
+  const graph = new Map(); // Adjacency list
+
+  // Directions for 4-connected adjacency
+  const directions = RECT_DIRECTIONS;
+
+  // Add diagonal directions if required
+  if (isDiagonal) {
+    directions.push(...DIAG_DIRECTIONS);
+  }
+
+  // Helper function to get unique node identifier
+  const getNodeId = (row, col) => `${row},${col}`;
+
+  // Build the graph
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      const nodeId = getNodeId(row, col);
+      graph.set(nodeId, []); // Initialize adjacency list for this node
+
+      // Check neighbors
+      for (const [dx, dy] of directions) {
+        const newRow = row + dx;
+        const newCol = col + dy;
+
+        // Ensure neighbor is within bounds
+        if (newRow >= 0 && newRow < rows && newCol >= 0 && newCol < cols) {
+          const neighborId = getNodeId(newRow, newCol);
+          graph.get(nodeId).push(neighborId);
+        }
+      }
+    }
+  }
+
+  return graph;
+};
 
 export const isValidPosition = (row, col, rows, cols) => {
   return row >= 0 && row < rows && col >= 0 && col < cols;
