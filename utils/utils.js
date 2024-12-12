@@ -13,6 +13,14 @@ export const createGrid = async (filePath) => {
     .map((line) => line.split(""));
 };
 
+export const parseInput = async (filePath) => {
+  // if (typeof filePath !== "string) throw new Error("Not a string");
+  const rawData = await fs.readFile(filePath, "utf8");
+  return rawData
+    .split("\r\n")
+    .filter(Boolean).toString();
+}
+
 export const DIRECTIONS = [
   [0, 1], // Right
   [0, -1], // Left
