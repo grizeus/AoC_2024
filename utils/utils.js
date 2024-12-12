@@ -14,7 +14,7 @@ export const createGrid = async (filePath) => {
 };
 
 export const parseInput = async (filePath) => {
-  // if (typeof filePath !== "string) throw new Error("Not a string");
+  if (typeof filePath !== "string") throw new Error("Not a string");
   const rawData = await fs.readFile(filePath, "utf8");
   return rawData
     .split("\r\n")
