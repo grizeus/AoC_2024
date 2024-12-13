@@ -4,7 +4,7 @@ import {
   createGraphFromMatrix,
 } from "../utils/utils.js";
 
-const path = pathBuilder("test.txt");
+const path = pathBuilder("input.txt");
 let grid;
 try {
   grid = await createGrid(path);
@@ -14,7 +14,7 @@ try {
 
 const rows = grid.length;
 const cols = grid[0].length;
-function findAllTrails(graph, start) {
+const findAllTrails = (graph, start) => {
   const trails = [];
 
   const highestPeeks = new Set();
@@ -52,7 +52,7 @@ function findAllTrails(graph, start) {
   // Start DFS from the given starting point
   dfs(start, []);
   return trails;
-}
+};
 
 const graph = createGraphFromMatrix(grid, false);
 let results = [];
@@ -63,5 +63,4 @@ for (let row = 0; row < rows; row++) {
     }
   }
 }
-// console.log(results.reduce((acc, el) => acc + el.length, 0));
-console.log(results);
+console.log(results.reduce((acc, el) => acc + el.length, 0));
