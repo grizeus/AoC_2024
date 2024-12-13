@@ -1,6 +1,6 @@
 import { pathBuilder, parseInput } from "../utils/utils.js";
 
-const path = pathBuilder("test.txt");
+const path = pathBuilder("input.txt");
 let inputFile;
 try {
   inputFile = await parseInput(path);
@@ -8,16 +8,17 @@ try {
   console.error(error.message);
 }
 
-let data = inputFile.split(" ").map(Number);
-
+const data = inputFile.split(" ").map(Number);
+// map to optimize lookup frequently computable values
 const memo = new Map();
 const stones = new Map();
+// transform input array into a map
 for (const stone of data) {
   if (!stones.has(stone)) {
     stones.set(stone, 1);
   }
 }
-console.log(stones);
+
 const transform = (num) => {
   if (num === 0) {
     return 1;
@@ -44,32 +45,44 @@ const transform = (num) => {
   return num * 2024;
 };
 
+const updatePairMap = (stone, results, ammount) => {
+  for (const result of results) {
+    if (!stones.has(result)) {
+      stones.set(result, ammount);
+    } else {
+      const lastAmmount = stones.get(result);
+      stones.set(result, ammount + lastAmmount);
+    }
+  }
+  const lastStoneAmmount = stones.get(stone);
+  stones.set(stone, lastStoneAmmount - ammount);
+};
+
 const updateMap = (stone, result, ammount) => {
+  const lastStoneAmmount = stones.get(stone);
   if (!stones.has(result)) {
     stones.set(result, ammount);
+    stones.set(stone, lastStoneAmmount - ammount);
   } else {
-    const lastAmmount = stones.get(result);
-    stones.set(result, ammount + lastAmmount);
-    stones.set(stone, 0);
+    const lastResAmmount = stones.get(result);
+    stones.set(result, ammount + lastResAmmount);
+    stones.set(stone, lastStoneAmmount - ammount);
   }
 };
 
-for (let i = 0; i < 2; i++) {
+for (let i = 0; i < 1000; i++) {
   const resultIter = [];
   for (const stone of stones) {
-    const ammount = stone[1];
     const results = transform(stone[0]);
-    resultIter.push({ results: [...[results].flat()], stone: stone });
-    if (Array.isArray(results)) {
-    } else {
-      updateMap(stone[0], results, ammount);
-    }
+    resultIter.push({ results: results, stone: stone });
   }
   for (const result of resultIter) {
-    for (const res of result.results) {
-      updateMap(result.stone[0], res, result.stone[1]);
+    if (Array.isArray(result.results)) {
+      updatePairMap(result.stone[0], result.results, result.stone[1]);
+    } else {
+      updateMap(result.stone[0], result.results, result.stone[1]);
     }
   }
-  console.log(stones, `blink ${i}`);
 }
 
+console.log(stones.values().reduce((acc, val) => acc + val, 0));
