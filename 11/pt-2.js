@@ -11,7 +11,14 @@ try {
 let data = inputFile.split(" ").map(Number);
 
 const memo = new Map();
-const ruleSet = (num) => {
+const stones = new Map();
+for (const stone of data) {
+  if (!stones.has(stone)) {
+    stones.set(stone, 1);
+  }
+}
+console.log(stones);
+const transform = (num) => {
   if (num === 0) {
     return 1;
   }
@@ -37,14 +44,32 @@ const ruleSet = (num) => {
   return num * 2024;
 };
 
-for (let i = 0; i < 75; i++) {
-  const bufArr = [];
-  for (let j = 0; j < data.length; j++) {
-    const res = ruleSet(data[j]);
-    bufArr.push(...[res].flat());
+const updateMap = (stone, result, ammount) => {
+  if (!stones.has(result)) {
+    stones.set(result, ammount);
+  } else {
+    const lastAmmount = stones.get(result);
+    stones.set(result, ammount + lastAmmount);
+    stones.set(stone, 0);
   }
-  console.log(data, `blink ${i}`);
-  data = [...bufArr];
+};
+
+for (let i = 0; i < 2; i++) {
+  const resultIter = [];
+  for (const stone of stones) {
+    const ammount = stone[1];
+    const results = transform(stone[0]);
+    resultIter.push({ results: [...[results].flat()], stone: stone });
+    if (Array.isArray(results)) {
+    } else {
+      updateMap(stone[0], results, ammount);
+    }
+  }
+  for (const result of resultIter) {
+    for (const res of result.results) {
+      updateMap(result.stone[0], res, result.stone[1]);
+    }
+  }
+  console.log(stones, `blink ${i}`);
 }
 
-console.log(data.length);
