@@ -1,13 +1,11 @@
-import assert from "node:assert";
 import {
   pathBuilder,
   createGrid,
-  createGraphFromMatrix,
   isValidPosition,
   RECT_DIRECTIONS,
 } from "../utils/utils.js";
 
-const path = pathBuilder("test.txt");
+const path = pathBuilder("input.txt");
 let grid;
 try {
   grid = await createGrid(path);
@@ -17,98 +15,54 @@ try {
 const rows = grid.length;
 const cols = grid[0].length;
 
-const gardenGraph = createGraphFromMatrix(grid);
 
-const findLongestTrail = (graph, start) => {
-  let longestTrail = [];
+const findAreaPerimeter = (visited, start) => {
+  const [startRow, startCol] = start.split(",").map(Number);
+  const startValue = grid[startRow][startCol];
+  let area = 0;
+  let perimeter = 0;
 
-  const getNodeValue = (node) => {
+
+  const stack = [start];
+
+  while (stack.length > 0) {
+    const node = stack.pop();
+    if (visited.has(node)) continue;
+
+    visited.add(node);
+    area++;
+
+    let localPerimeter = 4; // Start with 4 edges for the current node
     const [row, col] = node.split(",").map(Number);
-    return grid[row][col];
-  };
 
-  const dfs = (currentNode, trail) => {
-    trail.push(currentNode);
-    const currentValue = getNodeValue(currentNode);
-
-    // Traverse neighbors
-    for (const neighbor of graph.get(currentNode)) {
-      const neighborValue = getNodeValue(neighbor);
-
-      // Only proceed if the neighbor's value is same
-      if (neighborValue === currentValue && !trail.includes(neighbor)) {
-        dfs(neighbor, trail);
+    for (const [dy, dx] of RECT_DIRECTIONS) {
+      const [newRow, newCol] = [row + dy, col + dx];
+      const neighbor = `${newRow},${newCol}`;
+      if (isValidPosition(newRow, newCol, rows, cols)) {
+        if (grid[newRow][newCol] === startValue) {
+          localPerimeter--;
+          if (!visited.has(neighbor)) {
+            stack.push(neighbor);
+          }
+        }
       }
     }
-
-    if (trail.every((node) => getNodeValue(node) === currentValue)) {
-      if (trail.length > longestTrail.length) {
-        longestTrail = [...trail];
-      }
-    }
-
-    // Backtrack
-    trail.pop();
-  };
-
-  // Start DFS from the given starting point
-  dfs(start, []);
-  let fence = 0;
-  for (const node of longestTrail) {
-    const currentValue = getNodeValue(node);
-    let neighborsCount = 0;
-    for (const neighbor of graph.get(node)) {
-      if (currentValue === getNodeValue(neighbor)) {
-        neighborsCount++;
-      }
-    }
-    switch (neighborsCount) {
-      case 0: {
-        fence += 4;
-        break;
-      }
-      case 1: {
-        fence += 3;
-        break;
-      }
-      case 2: {
-        fence += 2;
-        break;
-      }
-      case 3: {
-        fence += 1;
-        break;
-      }
-      default: {
-        break;
-      }
-    }
+    perimeter += localPerimeter;
   }
-  assert(fence !== 0);
-  console.log(longestTrail, fence);
-  return longestTrail.length * fence;
+
+  // console.log(
+  //   `Region ${getNodeValue(start)} Area: ${area}, Perimeter: ${perimeter}`,
+  // );
+  return area * perimeter;
 };
 
-const isBordered = (row, col) => {
-  for (const direction of RECT_DIRECTIONS) {
-    const [dy, dx] = direction;
-    const [cy, cx] = [row + dy, col + dx];
-    if (
-      isValidPosition(cy, cx, rows, cols) &&
-      grid[cy][cx] === grid[row][col]
-    ) {
-      return true;
-    }
-  }
-  return false;
-};
-const mapedSites = new Set();
+const visited = new Set();
 const trails = [];
 for (let row = 0; row < rows; row++) {
   for (let col = 0; col < cols; col++) {
-    if (!mapedSites.has(grid[row][col]) || !isBordered(row, col)) {
-      trails.push(findLongestTrail(gardenGraph, `${row},${col}`));
-      mapedSites.add(grid[row][col]);
+    const node = `${row},${col}`;
+    if (!visited.has(node)) {
+      trails.push(findAreaPerimeter(visited, `${row},${col}`));
     }
   }
 }
