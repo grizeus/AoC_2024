@@ -70,7 +70,7 @@ const updateMap = (stone, result, ammount) => {
   }
 };
 
-for (let i = 0; i < 1000; i++) {
+for (let i = 0; i < 75; i++) {
   const resultIter = [];
   for (const stone of stones) {
     const results = transform(stone[0]);
