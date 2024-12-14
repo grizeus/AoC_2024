@@ -50,9 +50,6 @@ const findAreaPerimeter = (visited, start) => {
     perimeter += localPerimeter;
   }
 
-  // console.log(
-  //   `Region ${getNodeValue(start)} Area: ${area}, Perimeter: ${perimeter}`,
-  // );
   return area * perimeter;
 };
 
