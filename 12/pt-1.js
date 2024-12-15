@@ -15,13 +15,11 @@ try {
 const rows = grid.length;
 const cols = grid[0].length;
 
-
 const findAreaPerimeter = (visited, start) => {
   const [startRow, startCol] = start.split(",").map(Number);
   const startValue = grid[startRow][startCol];
   let area = 0;
   let perimeter = 0;
-
 
   const stack = [start];
 

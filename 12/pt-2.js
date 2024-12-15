@@ -2,11 +2,10 @@ import {
   pathBuilder,
   createGrid,
   isValidPosition,
-  MultiMap,
   RECT_DIRECTIONS,
 } from "../utils/utils.js";
 
-const path = pathBuilder("test.txt");
+const path = pathBuilder("input.txt");
 let grid;
 try {
   grid = await createGrid(path);
@@ -23,10 +22,10 @@ const findAreaSides = (visited, start) => {
   const region = new Set();
 
   const stack = [start];
-  const boundaryEdges = new MultiMap();
+  const boundaryEdges = new Map();
 
   while (stack.length > 0) {
-    const node = stack.pop();
+    const node = stack.shift();
     if (visited.has(node)) continue;
 
     visited.add(node);
@@ -38,68 +37,46 @@ const findAreaSides = (visited, start) => {
     for (const [dy, dx] of RECT_DIRECTIONS) {
       const [newRow, newCol] = [row + dy, col + dx];
       const neighbor = `${newRow},${newCol}`;
-      if (isValidPosition(newRow, newCol, rows, cols)) {
-        if (grid[newRow][newCol] === startValue) {
-          if (!visited.has(neighbor)) {
-            stack.push(neighbor);
-          }
-        } else {
-          // Add edge (current point and direction) to boundary
-          boundaryEdges.insert(`${row},${col}`, `${dy},${dx}`);
-        }
+      if (
+        isValidPosition(newRow, newCol, rows, cols) &&
+        grid[newRow][newCol] === startValue
+      ) {
+        stack.push(neighbor);
       } else {
-        // Add edge for grid boundary
-        boundaryEdges.insert(`${row},${col}`, `${dy},${dx}`);
+        const key = `${dy},${dx}`;
+        if (!boundaryEdges.has(key)) {
+          boundaryEdges.set(key, new Set());
+        }
+        boundaryEdges.get(key).add(neighbor);
       }
     }
   }
-
-  function computeGeometricalForm(directions) {
-    console.log(directions);
-    return;
-    const visited = new Set();
-    const boundary = [];
-
-    // Add each boundary cell based on its direction
-    for (const { x, y, dx, dy } of directions) {
-      const newX = x + dx;
-      const newY = y + dy;
-
-      // Track boundary points as unique coordinates
-      const point1 = `${x},${y}`;
-      const point2 = `${newX},${newY}`;
-
-      if (!visited.has(point1)) {
-        visited.add(point1);
-        boundary.push([x, y]);
-      }
-      if (!visited.has(point2)) {
-        visited.add(point2);
-        boundary.push([newX, newY]);
-      }
-    }
-
-    // Return the boundary points forming the geometric shape
-    console.log(boundary);
-    return boundary;
-  }
-  const sides = computeGeometricalForm(boundaryEdges);
-  return area * sides;
-};
-
-const countUniqueSides = (boundaryEdges) => {
-  const visitedEdges = new Set();
   let sides = 0;
 
-  for (const [row, col, dy, dx] of boundaryEdges) {
-    const edge = `${row},${col},${dy},${dx}`;
-    if (!visitedEdges.has(edge)) {
-      visitedEdges.add(edge);
+  for (const [_, vs] of boundaryEdges) {
+    const seened = new Set();
+
+    for (const vert of vs) {
+      if (seened.has(vert)) continue;
       sides++;
+      const queue = [vert.split(",").map(Number)];
+
+      while (queue.length > 0) {
+        const [row, col] = queue.shift();
+        if (seened.has(`${row},${col}`)) continue;
+
+        seened.add(`${row},${col}`);
+
+        for (const [dy, dx] of RECT_DIRECTIONS) {
+          const [newRow, newCol] = [row + dy, col + dx];
+          if (vs.has(`${newRow},${newCol}`)) {
+            queue.push([newRow, newCol]);
+          }
+        }
+      }
     }
   }
-
-  return sides;
+  return area * sides;
 };
 
 const visited = new Set();
