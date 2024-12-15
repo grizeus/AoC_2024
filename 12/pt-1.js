@@ -5,7 +5,7 @@ import {
   RECT_DIRECTIONS,
 } from "../utils/utils.js";
 
-const path = pathBuilder("input.txt");
+const path = pathBuilder("test.txt");
 let grid;
 try {
   grid = await createGrid(path);
