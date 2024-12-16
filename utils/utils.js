@@ -19,6 +19,10 @@ export const parseInput = async (filePath) => {
   return rawData;
 };
 
+export const print = (value) => {
+  console.log(value);
+};
+
 export const DIRECTIONS = [
   [0, 1], // Right
   [0, -1], // Left

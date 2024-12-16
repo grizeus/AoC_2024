@@ -2,6 +2,7 @@ import {
   pathBuilder,
   createGrid,
   createGraphFromMatrix,
+  print,
 } from "../utils/utils.js";
 
 const path = pathBuilder("input.txt");
@@ -61,4 +62,4 @@ for (let row = 0; row < rows; row++) {
     }
   }
 }
-console.log(results.reduce((acc, el) => acc + el.length, 0));
+print(results.reduce((acc, el) => acc + el.length, 0));

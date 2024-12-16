@@ -1,4 +1,4 @@
-import { pathBuilder, parseInput } from "../utils/utils.js";
+import { pathBuilder, parseInput, print } from "../utils/utils.js";
 
 const path = pathBuilder("input.txt");
 let inputFile;
@@ -20,6 +20,22 @@ const preparedData = inputFile
   )
   .map((section) => section.map((entries) => entries.map(Number)));
 const results = [];
+
+const getCost = (a, b, res, maxPresses) => {
+  let y = (a[0] * res[1] - a[1] * res[0]) / (-(a[1] * b[0]) + a[0] * b[1]);
+  let x = (res[0] - b[0] * y) / a[0];
+
+  // check for integer results
+  if (parseInt(x) !== x || parseInt(y) !== y) return 0;
+
+  [x, y] = [parseInt(x), parseInt(y)];
+
+  if (x > maxPresses || y > maxPresses) {
+    return 0;
+  }
+
+  return 3 * x + y;
+};
 for (const [a, b, res] of preparedData) {
   /*
    * entry[0][0] * x + entry[1][0] * y == entry[2][0]);
@@ -27,18 +43,7 @@ for (const [a, b, res] of preparedData) {
    * at the same time
    * x=y V x!=y V {x, y} <= 100
    */
-  for (let i = 0; i <= 100; i++) {
-    for (let j = 0; j <= 100; j++) {
-      const productX = a[0] * i + b[0] * j;
-      const productY = a[1] * i + b[1] * j;
-      if (productX > res[0] || productY > res[1]) {
-        break;
-      }
-      if (productX === res[0] && productY === res[1]) {
-        results.push([i, j]);
-      }
-    }
-  }
+  results.push(getCost(a, b, res, 100));
 }
 
-console.log(results.reduce((acc, [a, b]) => acc + a * 3 + b, 0));
+print(results.reduce((acc, a) => acc + a, 0));

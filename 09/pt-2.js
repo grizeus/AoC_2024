@@ -1,4 +1,4 @@
-import { pathBuilder, parseInput } from "../utils/utils.js";
+import { pathBuilder, parseInput, print } from "../utils/utils.js";
 
 const path = pathBuilder("input.txt");
 let fileInput;
@@ -53,8 +53,9 @@ const defragmentate = (fileInput) => {
 };
 
 const disk = defragmentate(fileInput);
-let res = disk.reduce(
-  (acc, curr, i) => (curr !== "." ? acc + Number(curr) * i : acc),
-  0
+print(
+  disk.reduce(
+    (acc, curr, i) => (curr !== "." ? acc + Number(curr) * i : acc),
+    0
+  )
 );
-console.log(res);

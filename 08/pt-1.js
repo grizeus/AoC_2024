@@ -4,6 +4,7 @@ import {
   isValidPosition,
   MultiMap,
   generateUniqueCombinations,
+  print,
 } from "../utils/utils.js";
 
 const path = pathBuilder("input.txt");
@@ -53,4 +54,4 @@ for (const key of keys) {
   }
 }
 const uniqueAntinodes = antinodes.flat().filter((v, i, arr) => arr.indexOf(v) === i);
-console.log(uniqueAntinodes.length);
+print(uniqueAntinodes.length);

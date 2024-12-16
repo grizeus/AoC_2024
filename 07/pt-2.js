@@ -1,17 +1,13 @@
-import fs from "node:fs/promises";
-import path from "node:path";
+import { parseInput, pathBuilder, print } from "../utils/utils";
 
 const parseFileInput = async (filePath) => {
-  const rawData = await fs.readFile(filePath, "utf8");
+  const rawData = await parseInput(filePath);
   return rawData
     .split("\r\n")
     .map((line) => line.split(":"))
     .map(([target, values]) => [
       Number(target),
-      values
-        .split(" ")
-        .filter(Boolean)
-        .map(Number),
+      values.split(" ").filter(Boolean).map(Number),
     ]);
 };
 
@@ -57,16 +53,14 @@ const aggregate = (desiredValue, inputValues) => {
 };
 
 try {
-  const filePath = path.join(process.cwd(), "input.txt");
+  const filePath = pathBuilder("input.txt");
   const fileInput = await parseFileInput(filePath);
 
   const result = fileInput
     .map(([desiredValue, inputValues]) => aggregate(desiredValue, inputValues))
     .reduce((acc, value) => acc + value, 0);
 
-  console.log(result);
+  print(result);
 } catch (error) {
   console.error("Error:", error.message);
 }
-
-

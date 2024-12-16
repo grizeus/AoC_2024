@@ -1,6 +1,4 @@
-import { parse } from "path";
-import { pathBuilder, parseInput } from "../utils/utils.js";
-import { get } from "http";
+import { pathBuilder, parseInput, print } from "../utils/utils.js";
 
 const path = pathBuilder("input.txt");
 let inputFile;
@@ -26,8 +24,9 @@ const shift = 10_000_000_000_000;
 const getCost = (a, b, res, maxPresses) => {
   let y = (a[0] * (res[1] + shift) - a[1] * (res[0] + shift)) / (-(a[1] * b[0]) + a[0] * b[1]);
   let x = ((res[0] + shift) - b[0] * y) / a[0];
-  console.log(x, y);
-  if (Math.trunc(x) !== x || Math.trunc(y) !== y) return 0;
+
+  // check for integer results
+  if (parseInt(x) !== x || parseInt(y) !== y) return 0;
 
   [x, y] = [parseInt(x), parseInt(y)];
 
@@ -47,4 +46,4 @@ for (const [a, b, res] of preparedData) {
   results.push(getCost(a, b, res, Math.pow(10, 15)));
 }
 
-console.log(results.reduce((acc, a) => acc + a, 0));
+print(results.reduce((acc, a) => acc + a, 0));

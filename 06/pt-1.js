@@ -1,9 +1,7 @@
-import fs from "node:fs/promises";
-import path from "node:path";
+import { createGrid, pathBuilder, print } from "../utils/utils";
 
-const grid = (await fs.readFile(path.join(process.cwd(), "input.txt"), "utf8"))
-  .split("\r\n")
-  .map((line) => line.split(""));
+const path = pathBuilder("input.txt");
+const grid = await createGrid(path);
 
 const rows = grid.length;
 const cols = grid[0].length;
@@ -116,4 +114,4 @@ while (
   position = guard.position;
 }
 
-console.log(guard.path.size);
+print(guard.path.size);

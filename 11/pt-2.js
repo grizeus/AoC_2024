@@ -1,4 +1,4 @@
-import { pathBuilder, parseInput } from "../utils/utils.js";
+import { pathBuilder, parseInput, print } from "../utils/utils.js";
 
 const path = pathBuilder("input.txt");
 let inputFile;
@@ -85,4 +85,4 @@ for (let i = 0; i < 75; i++) {
   }
 }
 
-console.log(stones.values().reduce((acc, val) => acc + val, 0));
+print(Array.from(stones.values()).reduce((acc, val) => acc + val, 0));

@@ -1,4 +1,4 @@
-import { pathBuilder, parseInput } from "../utils/utils.js";
+import { pathBuilder, parseInput, print } from "../utils/utils.js";
 
 const path = pathBuilder("input.txt");
 let inputFile;
@@ -37,4 +37,4 @@ for (let i = 0; i < 25; i++) {
   data = [...bufArr];
 }
 
-console.log(data.length);
+print(data.length);
