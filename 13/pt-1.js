@@ -1,6 +1,6 @@
 import { pathBuilder, parseInput } from "../utils/utils.js";
 
-const path = pathBuilder("test.txt");
+const path = pathBuilder("input.txt");
 let inputFile;
 try {
   inputFile = await parseInput(path);
@@ -8,6 +8,35 @@ try {
   console.error(error.message);
 }
 
-const chunks = inputFile.split("\r\n\r\n");
+const preparedData = inputFile
+  .split("\r\n\r\n")
+  .map((section) => section.split("\r\n"))
+  .map((lines) =>
+    lines.map((line) => {
+      const dataPart = line.substring(line.indexOf(":") + 2);
+      const entries = dataPart.split(", ");
+      return entries.map((entry) => entry.substring(2));
+    }),
+  )
+  .map((section) => section.map((entries) => entries.map(Number)));
+const results = [];
+for (const entry of preparedData) {
+  /*
+   * entry[0][0] * x + entry[1][0] * y == entry[2][0]);
+   * entry[0][1] * x + entry[1][1] * y == entry[2][1]);
+   * at the same time
+   * x=y V x!=y V {x, y} <= 100
+   */
+  for (let i = 0; i <= 100; i++) {
+    for (let j = 0; j <= 100; j++) {
+      if (
+        entry[0][0] * i + entry[1][0] * j === entry[2][0] &&
+        entry[0][1] * i + entry[1][1] * j === entry[2][1]
+      ) {
+        results.push([i, j]);
+      }
+    }
+  }
+}
 
-console.log(chunks);
+console.log(results.reduce((acc, [a, b]) => acc + a * 3 + b, 0));
