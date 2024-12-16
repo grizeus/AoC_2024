@@ -3,6 +3,7 @@ import {
   createGrid,
   isValidPosition,
   RECT_DIRECTIONS,
+  print,
 } from "../utils/utils.js";
 
 const path = pathBuilder("input.txt");
@@ -80,13 +81,13 @@ const findAreaSides = (visited, start) => {
 };
 
 const visited = new Set();
-const trails = [];
+const regions = [];
 for (let row = 0; row < rows; row++) {
   for (let col = 0; col < cols; col++) {
     const node = `${row},${col}`;
     if (!visited.has(node)) {
-      trails.push(findAreaSides(visited, `${row},${col}`));
+      regions.push(findAreaSides(visited, `${row},${col}`));
     }
   }
 }
-console.log(trails.reduce((acc, el) => acc + el, 0));
+print(regions.reduce((acc, el) => acc + el, 0));

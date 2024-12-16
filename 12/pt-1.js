@@ -3,9 +3,10 @@ import {
   createGrid,
   isValidPosition,
   RECT_DIRECTIONS,
+  print,
 } from "../utils/utils.js";
 
-const path = pathBuilder("test.txt");
+const path = pathBuilder("input.txt");
 let grid;
 try {
   grid = await createGrid(path);
@@ -52,13 +53,13 @@ const findAreaPerimeter = (visited, start) => {
 };
 
 const visited = new Set();
-const trails = [];
+const regions = [];
 for (let row = 0; row < rows; row++) {
   for (let col = 0; col < cols; col++) {
     const node = `${row},${col}`;
     if (!visited.has(node)) {
-      trails.push(findAreaPerimeter(visited, `${row},${col}`));
+      regions.push(findAreaPerimeter(visited, `${row},${col}`));
     }
   }
 }
-console.log(trails.reduce((acc, el) => acc + el, 0));
+print(regions.reduce((acc, el) => acc + el, 0));
