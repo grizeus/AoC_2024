@@ -1,4 +1,3 @@
-import assert from "node:assert";
 import { parseInput, pathBuilder, mod, print } from "../utils/utils.js";
 
 const rawData = await parseInput(pathBuilder("input.txt"));
