@@ -23,6 +23,10 @@ export const print = (value) => {
   console.log(value);
 };
 
+export const mod = (x, y) => {
+  return ((x % y) + y) % y;
+};
+
 export const DIRECTIONS = [
   [0, 1], // Right
   [0, -1], // Left
