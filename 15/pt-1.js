@@ -15,7 +15,7 @@ try {
 
 const [map, movesLine] = inputFile.split("\r\n\r\n");
 const grid = map.split("\r\n").map((line) => line.split(""));
-const moveList = movesLine.split("");
+const movesList = movesLine.split("");
 
 const [right, left, down, up] = RECT_DIRECTIONS;
 const ROWS = grid.length;
@@ -47,6 +47,26 @@ const move = (coord, symb) => {
     default:
       break;
   }
+};
+
+const isMovable = (positon, dir) => {
+  const [cy, cx] = positon;
+  const [dy, dx] = dir;
+  const [ny, nx] = [cy + dy, cx + dx];
+  if (grid[ny][nx] === "#") {
+    return false;
+  }
+  return true;
+};
+
+const isEmpty = (positon, dir) => {
+  const [cy, cx] = positon;
+  const [dy, dx] = dir;
+  const [ny, nx] = [cy + dy, cx + dx];
+  if (grid[ny][nx] === ".") {
+    return true;
+  }
+  return false;
 };
 
 print(map);
