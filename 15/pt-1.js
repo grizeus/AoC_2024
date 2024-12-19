@@ -21,6 +21,9 @@ const [right, left, down, up] = RECT_DIRECTIONS;
 const ROWS = grid.length;
 const COLS = grid[0].length;
 
+const addPos = ([a, b], [c, d]) => [a + c, b + d];
+const isSameCoord = ([a, b], [c, d]) => a === c && b === d;
+
 const getDirection = (step) => {
   switch (step) {
     case "^": {
@@ -41,27 +44,18 @@ const getDirection = (step) => {
 };
 
 const move = (coord, symb) => {
-  const [y, x] = coord;
   switch (symb) {
     case "^": {
-      const ny = y + up[0];
-      const nx = x + up[1];
-      return [ny, nx];
+      return addPos(coord, up);
     }
     case "v": {
-      const ny = y + down[0];
-      const nx = x + down[1];
-      return [ny, nx];
+      return addPos(coord, down);
     }
     case ">": {
-      const ny = y + right[0];
-      const nx = x + right[1];
-      return [ny, nx];
+      return addPos(coord, right);
     }
     case "<": {
-      const ny = y + left[0];
-      const nx = x + left[1];
-      return [ny, nx];
+      return addPos(coord, left);
     }
     default:
       break;
@@ -69,9 +63,8 @@ const move = (coord, symb) => {
 };
 
 const isMovable = (positon, dir) => {
-  const [cy, cx] = positon;
-  const [dy, dx] = dir;
-  const [ny, nx] = [cy + dy, cx + dx];
+  const nextPos = addPos(positon, dir);
+  const [ny, nx] = nextPos;
   if (grid[ny][nx] === "#") {
     return false;
   }
@@ -79,9 +72,8 @@ const isMovable = (positon, dir) => {
 };
 
 const isNextEmpty = (positon, dir) => {
-  const [cy, cx] = positon;
-  const [dy, dx] = dir;
-  const [ny, nx] = [cy + dy, cx + dx];
+  const nextPos = addPos(positon, dir);
+  const [ny, nx] = nextPos;
   if (grid[ny][nx] === ".") {
     return true;
   }
@@ -90,29 +82,45 @@ const isNextEmpty = (positon, dir) => {
 
 const swapPos = (firstPos, dir) => {
   // create position from direction
+  let secondPos = addPos(firstPos, dir);
+  const [fy, fx] = firstPos;
+  const [sy, sx] = secondPos;
 
-  const [y, x] = firstPos;
-  const [dy, dx] = dir;
-  let secondPos = [y + dy, x + dx];
-  const [ny, nx] = secondPos;
-
-  const firstVal = grid[y][x];
-  const secondVal = grid[ny][nx];
+  const firstVal = grid[fy][fx];
+  const secondVal = grid[sy][sx];
 
   const buff = firstPos;
   firstPos = secondPos;
   secondPos = buff;
 
-  grid[y][x] = secondVal;
-  grid[ny][nx] = firstVal;
+  grid[fy][fx] = secondVal;
+  grid[sy][sx] = firstVal;
+};
+
+const moveBackwards = (pos, dir) => {
+  switch (dir) {
+    case up: {
+      return addPos(pos, down);
+    }
+    case down: {
+      return addPos(pos, up);
+    }
+    case right: {
+      return addPos(pos, left);
+    }
+    case left: {
+      return addPos(pos, right);
+    }
+    default:
+      break;
+  }
 };
 
 const findLastBox = (pos, dir) => {
-  const step = ([y, x], [dy, dx]) => [y + dy, x + dx];
-  let nextPos = step(pos, dir);
+  let nextPos = addPos(pos, dir);
 
   while (!isNextEmpty(nextPos, dir) || !isMovable(nextPos, dir)) {
-    nextPos = step(nextPos, dir);
+    nextPos = addPos(nextPos, dir);
   }
 
   return nextPos;
@@ -136,6 +144,12 @@ for (const step of stepsList) {
     continue;
   }
   if (isMovable(fish, dir)) {
+    let lastBox = findLastBox(fish, dir);
+    while (!isSameCoord(lastBox, fish)) {
+      swapPos(lastBox, dir);
+      lastBox = moveBackwards(lastBox, dir);
+    }
+    swapPos(fish, dir);
   }
 }
 
