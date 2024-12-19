@@ -15,7 +15,7 @@ try {
 
 const [map, stepsLine] = inputFile.split("\r\n\r\n");
 let grid = map.split("\r\n").map((line) => line.split(""));
-const stepsList = stepsLine.split("");
+const stepsList = stepsLine.replace("\r\n", "").split("");
 
 const [right, left, down, up] = RECT_DIRECTIONS;
 const ROWS = grid.length;
@@ -103,7 +103,19 @@ const swapPos = (firstPos, dir) => {
   firstPos = secondPos;
   secondPos = buff;
 
-  
+  grid[y][x] = secondVal;
+  grid[ny][nx] = firstVal;
+};
+
+const findLastBox = (pos, dir) => {
+  const step = ([y, x], [dy, dx]) => [y + dy, x + dx];
+  let nextPos = step(pos, dir);
+
+  while (!isNextEmpty(nextPos, dir) || !isMovable(nextPos, dir)) {
+    nextPos = step(nextPos, dir);
+  }
+
+  return nextPos;
 };
 
 let fish = null;
@@ -120,6 +132,10 @@ for (let row = 0; row < ROWS; row++) {
 for (const step of stepsList) {
   const dir = getDirection(step);
   if (isNextEmpty(fish, dir)) {
+    swapPos(fish, dir);
+    continue;
+  }
+  if (isMovable(fish, dir)) {
   }
 }
 
