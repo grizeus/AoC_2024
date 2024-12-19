@@ -19,8 +19,8 @@ export const parseInput = async (filePath) => {
   return rawData;
 };
 
-export const print = (value) => {
-  console.log(value);
+export const print = (...values) => {
+  console.log(...values);
 };
 
 export const mod = (x, y) => {

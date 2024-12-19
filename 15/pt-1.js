@@ -139,5 +139,5 @@ for (const step of stepsList) {
   }
 }
 
-print(map);
+print(map, fish);
 print(fish);
